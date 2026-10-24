@@ -1,0 +1,91 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hamse Panel</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#000;color:#fff;font-family:system-ui,sans-serif;padding:16px 16px 90px}
+h1{margin:0;font-size:30px}.l{color:#999}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+button,input,select{font:inherit;color:#fff}
+.btn{background:#222;border:1px solid #333;border-radius:20px;padding:10px 14px;cursor:pointer}
+.red{color:#ff453a}.pri{background:#fff;color:#000;width:100%;font-weight:700;margin-top:6px}
+.card{background:#111;border:1px solid #222;border-radius:20px;padding:16px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}.grid .card{margin:0}.n{font-size:34px;font-weight:700}
+input,select{width:100%;background:#1b1b1d;border:1px solid #333;border-radius:14px;padding:12px;margin:6px 0 10px}
+.mono{font-family:monospace;font-size:18px;word-break:break-all;margin-bottom:6px}
+.tag{display:inline-block;border-radius:10px;padding:3px 10px;font-size:13px;margin-right:6px;background:#222}
+.g{background:#12351f;color:#30d158}.b{background:#3a1212;color:#ff453a}
+.row{display:flex;gap:8px;margin-top:10px}.row .btn{flex:1;padding:10px 4px}
+nav{position:fixed;bottom:0;left:0;right:0;background:#0b0b0b;border-top:1px solid #222;display:flex}
+nav div{flex:1;text-align:center;padding:14px 0;font-size:11px;color:#888}nav div.on{color:#bf5af2}
+.bars{display:flex;align-items:flex-end;gap:6px;height:170px}.bars div{flex:1;text-align:center;font-size:12px}.bars i{display:block;background:#0a84ff;border-radius:6px 6px 0 0;margin:4px 0}
+.set{display:flex;justify-content:space-between;padding:14px 0;border-bottom:1px solid #222;cursor:pointer}
+.act{padding:10px 0;border-bottom:1px solid #222}
+#err{color:#f55;white-space:pre-wrap}
+</style></head><body>
+<div id="err"></div>
+<div id="app">Loading...</div>
+<nav><div data-t="Overview">Overview</div><div data-t="Keys">Keys</div><div data-t="Users">Users</div><div data-t="Referrals">Referrals</div><div data-t="Analytics">Analytics</div><div data-t="Settings">Settings</div></nav>
+<script>
+window.onerror=function(m,s,l){document.getElementById('err').textContent+=m+' (line '+l+')\n'};
+</script>
+<script>
+var $=function(s){return document.querySelector(s)};
+function ld(k,d){try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}}
+function sv(k,v){localStorage.setItem(k,JSON.stringify(v))}
+function esc(t){return String(t).replace(/[<>&"]/g,function(c){return '&#'+c.charCodeAt(0)+';'})}
+var me=ld('hw_session',null),U=ld('hw_users',{});
+var keys=ld('hw_keys',[]),refs=ld('hw_refs',[]),acts=ld('hw_act',[]),st=ld('hw_set',{snd:true}),tab='Overview',q='';
+function save(){sv('hw_keys',keys);sv('hw_refs',refs);sv('hw_act',acts);sv('hw_users',U);sv('hw_set',st)}
+function log(t){acts.unshift({t:t,at:Date.now()});acts=acts.slice(0,100)}
+function gen(){var c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',a=new Uint32Array(16),s='';crypto.getRandomValues(a);for(var i=0;i<16;i++){s+=c[a[i]%c.length];if(i%4==3&&i<15)s+='-'}return s}
+function ago(ms){var m=Math.floor((Date.now()-ms)/60000);return m<1?'now':m<60?m+' min ago':m<1440?Math.floor(m/60)+' h ago':Math.floor(m/1440)+' d ago'}
+function fmt(ms){return new Date(ms).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}
+function kst(k){return !k.on?'Off':k.exp<Date.now()?'Expired':'Active'}
+function cp(t){try{navigator.clipboard.writeText(t)}catch(e){}alert('Copied')}
+function out(){localStorage.removeItem('hw_session');location.replace('index.html')}
+function go(t){tab=t;q='';R()}
+function same(d){return new Date(d).toDateString()==new Date().toDateString()}
+
+function ov(){
+ var a=keys.filter(function(k){return kst(k)=='Active'}).length,e=keys.filter(function(k){return kst(k)=='Expired'}).length;
+ var td=acts.filter(function(x){return same(x.at)}).length;
+ var h='<div class="grid"><div class="card"><div class="l">Total Users</div><div class="n">'+Object.keys(U).length+'</div></div><div class="card"><div class="l">Active Keys</div><div class="n">'+a+'</div></div><div class="card"><div class="l">Expired Keys</div><div class="n">'+e+'</div></div><div class="card"><div class="l">Activity Today</div><div class="n">'+td+'</div></div></div><h2>Recent Activity</h2><div class="card">';
+ h+=acts.slice(0,8).map(function(x){return '<div class="act">'+esc(x.t)+'<div class="l">'+ago(x.at)+'</div></div>'}).join('')||'<div class="l">Ma jiro</div>';
+ return h+'</div>'}
+
+function ks(){return '<div class="card"><h3>Generate keys</h3><div class="l">Duration</div><select id="d"><option value="1">1 day</option><option value="7">7 days</option><option value="30" selected>30 days</option><option value="90">90 days</option><option value="365">365 days</option></select><div class="l">Devices</div><input id="v" type="number" value="1" min="1"><div class="l">Quantity</div><input id="qt" type="number" value="1" min="1" max="50"><button class="btn pri" onclick="mk()">Generate</button></div><input placeholder="Search keys..." oninput="q=this.value;$(\'#list\').innerHTML=kl()"><div id="list">'+kl()+'</div>'}
+function kl(){return keys.filter(function(k){return k.k.indexOf(q.toUpperCase())>=0}).map(function(k){var s=kst(k);return '<div class="card"><div class="mono">'+k.k+'</div><span class="tag '+(s=='Active'?'g':'b')+'">'+s+'</span><span class="l">'+fmt(k.exp)+' · '+k.dev+' device'+(k.dev>1?'s':'')+(k.user?' · '+esc(k.user):'')+'</span><div class="row"><button class="btn" onclick="cp(\''+k.k+'\')">Copy</button><button class="btn" onclick="tg(\''+k.k+'\')">'+(k.on?'Deactivate':'Activate')+'</button><button class="btn red" onclick="dk(\''+k.k+'\')">Delete</button></div></div>'}).join('')||'<div class="l">Ma jiro key</div>'}
+function mk(){var d=+$('#d').value,v=Math.max(1,+$('#v').value||1),n=Math.min(50,Math.max(1,+$('#qt').value||1));for(var i=0;i<n;i++)keys.unshift({k:gen(),exp:Date.now()+d*864e5,dev:v,on:true,user:null});log(n+' new key created');save();R()}
+function tg(k){var x=keys.filter(function(y){return y.k==k})[0];x.on=!x.on;save();R()}
+function dk(k){if(!confirm('Delete?'))return;keys=keys.filter(function(y){return y.k!=k});log('Key deleted');save();R()}
+
+function us(){return '<input placeholder="Search users..." oninput="q=this.value;$(\'#list\').innerHTML=ul()"><div id="list">'+ul()+'</div>'}
+function ul(){return Object.keys(U).filter(function(n){return U[n].name.toLowerCase().indexOf(q.toLowerCase())>=0}).map(function(n){var u=U[n],k=keys.filter(function(y){return y.user==n})[0];return '<div class="card"><div class="mono">'+esc(u.name)+'</div><span class="tag '+(u.banned?'b':'g')+'">'+(u.banned?'Banned':'Active')+'</span>'+(k?'<span class="tag">'+k.k+' <span onclick="un(\''+k.k+'\')">×</span></span>':'<span class="l">No key assigned</span>')+'<div class="row"><button class="btn" onclick="as(\''+n+'\')">Assign key</button>'+(n==me?'':'<button class="btn red" onclick="bn(\''+n+'\')">'+(u.banned?'Unban':'Ban')+'</button>')+'</div></div>'}).join('')}
+function as(n){var k=keys.filter(function(y){return !y.user&&y.on&&y.exp>Date.now()})[0];if(!k)return alert('Ma jiro key bannaan. Samee key marka hore.');k.user=n;log('Key assigned to '+U[n].name);save();R()}
+function un(k){keys.filter(function(y){return y.k==k})[0].user=null;save();R()}
+function bn(n){U[n].banned=!U[n].banned;log((U[n].banned?'Banned ':'Unbanned ')+U[n].name);save();R()}
+
+function rf(){return '<div class="card"><h3>Create referral code</h3><div class="l">Code (optional)</div><input id="rc" placeholder="Auto: HAMSE-XXXXXX"><div class="l">Max uses</div><input id="rm" type="number" value="1" min="1"><button class="btn pri" onclick="mr()">Create code</button></div>'+refs.map(function(r){var s=!r.on?'Off':r.used>=r.max?'Full':'Active';return '<div class="card"><div class="mono">'+r.c+'</div><span class="tag '+(s=='Active'?'g':'b')+'">'+s+'</span><span class="l">'+r.used+' / '+r.max+' used</span><div class="row"><button class="btn" onclick="cp(\''+r.c+'\')">Copy</button><button class="btn" onclick="tr(\''+r.c+'\')">'+(r.on?'Deactivate':'Activate')+'</button><button class="btn red" onclick="dr(\''+r.c+'\')">Delete</button></div></div>'}).join('')}
+function mr(){var c=$('#rc').value.toUpperCase().replace(/[^A-Z0-9-]/g,'');if(!c)c='HAMSE-'+gen().slice(0,6);if(refs.some(function(r){return r.c==c}))return alert('Code hore ayuu u jiray');refs.unshift({c:c,max:Math.max(1,+$('#rm').value||1),used:0,on:true});log('Referral created');save();R()}
+function tr(c){var r=refs.filter(function(x){return x.c==c})[0];r.on=!r.on;save();R()}
+function dr(c){if(!confirm('Delete?'))return;refs=refs.filter(function(x){return x.c!=c});save();R()}
+
+function an(){
+ var a=keys.filter(function(k){return kst(k)=='Active'}).length,e=keys.filter(function(k){return kst(k)=='Expired'}).length;
+ var C=[['Total keys',keys.length],['Active',a],['Expired',e],['Unassigned',keys.filter(function(k){return !k.user}).length],['Users',Object.keys(U).length],['Banned',Object.keys(U).filter(function(n){return U[n].banned}).length],['Referrals used',refs.reduce(function(s,r){return s+r.used},0)],['Referral codes',refs.length]];
+ var D=[],mx=1;
+ for(var i=6;i>=0;i--){var d=new Date();d.setDate(d.getDate()-i);var c=acts.filter(function(x){return new Date(x.at).toDateString()==d.toDateString()}).length;D.push([d.toLocaleDateString('en-US',{weekday:'short'}),c]);if(c>mx)mx=c}
+ return '<div class="grid">'+C.map(function(c){return '<div class="card"><div class="l">'+c[0]+'</div><div class="n">'+c[1]+'</div></div>'}).join('')+'</div><div class="card"><h3>Activity, last 7 days</h3><div class="bars">'+D.map(function(x){return '<div>'+x[1]+'<i style="height:'+Math.max(3,x[1]/mx*120)+'px"></i>'+x[0]+'</div>'}).join('')+'</div></div>'}
+
+function se(){return '<div class="card"><div class="set"><span>Username</span><span class="l">'+esc(U[me].name)+'</span></div><div class="set" onclick="cpw()"><span>Change password</span><span>›</span></div><div class="set" onclick="ex()"><span>Export backup (JSON)</span><span>›</span></div><div class="set red" onclick="ca()"><span>Clear activity</span><span>›</span></div><div class="set" onclick="st.snd=!st.snd;save();R()"><span>Touch sounds</span><span>'+(st.snd?'ON':'OFF')+'</span></div><div class="set"><span>Version</span><span class="l">Hamse Panel 1.0</span></div><div class="set red" onclick="out()"><span>Log out</span><span>›</span></div></div>'}
+function cpw(){var p=prompt('Password cusub:');if(!p||p.length<4)return;crypto.subtle.digest('SHA-256',new TextEncoder().encode(p)).then(function(b){U[me].pw=Array.prototype.map.call(new Uint8Array(b),function(x){return x.toString(16).padStart(2,'0')}).join('');save();alert('Waa la beddelay')})}
+function ex(){var b=new Blob([JSON.stringify({users:U,keys:keys,refs:refs,acts:acts},null,1)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='backup.json';a.click()}
+function ca(){if(confirm('Clear activity?')){acts=[];save();R()}}
+
+function R(){
+ var T={Overview:ov,Keys:ks,Users:us,Referrals:rf,Analytics:an,Settings:se};
+ $('#app').innerHTML='<div class="top"><div><h1>'+tab+'</h1><div class="l">Welcome, '+esc(U[me].name)+'</div></div><button class="btn" onclick="out()">Logout</button></div>'+T[tab]();
+ document.querySelectorAll('nav div').forEach(function(d){d.className=d.getAttribute('data-t')==tab?'on':''});
+}
+document.querySelectorAll('nav div').forEach(function(d){d.onclick=function(){go(d.getAttribute('data-t'))}});
+document.addEventListener('click',function(e){if(st.snd&&e.target.closest('button,nav div')){try{var c=new AudioContext(),o=c.createOscillator();o.frequency.value=600;o.connect(c.destination);o.start();o.stop(c.currentTime+.04)}catch(x){}}});
+if(!me||!U[me]||U[me].banned){$('#app').innerHTML='<div class="card">Fadlan marka hore gal.<br><br><a href="index.html" style="color:#fff">Tag Sign In</a></div>'}else{R()}
+</script></body></html>
