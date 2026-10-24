@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Abdi</title>
+<style>
+:root{--bg:#000;--fg:#fff;--muted:#8a8a8a;--field:#1c1c1e;--btn2:#1a1a1a;--err:#ff6b6b}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:Roboto,system-ui,-apple-system,"Segoe UI",sans-serif}
+#dots{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+.view{position:fixed;inset:0;z-index:1;display:none;flex-direction:column;padding:max(24px,env(safe-area-inset-top)) 24px max(28px,env(safe-area-inset-bottom));max-width:520px;margin:0 auto}
+.view.on{display:flex}
+.grow{flex:1}
+.avatar{width:68px;height:68px;border-radius:50%;background:#fff;border:3px solid #444;display:grid;place-items:center;margin:14vh auto 0}
+.avatar svg{width:30px;height:30px;fill:#000}
+h1{font-size:clamp(44px,13vw,64px);font-weight:700;margin:0;text-align:center;letter-spacing:-1px}
+.sub{color:var(--muted);text-align:center;font-size:clamp(18px,5vw,24px);margin:10px 0 34px}
+.btn{display:block;width:100%;height:58px;border:0;border-radius:29px;font-weight:600;font-size:19px;font-family:inherit;cursor:pointer;margin-bottom:14px}
+.btn.p{background:#fff;color:#000}
+.btn.s{background:var(--btn2);color:#fff}
+.btn:active{transform:scale(.98)}
+.btn:focus-visible,input:focus-visible,.back:focus-visible,.eye:focus-visible,.link:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.back{background:none;border:0;color:#fff;font-size:34px;line-height:1;padding:8px 0;width:48px;text-align:left;cursor:pointer;margin-top:12px}
+.form h1{text-align:left;font-size:clamp(38px,11vw,52px)}
+.form .sub{text-align:left;margin:8px 0 28px;font-size:clamp(16px,4.6vw,21px)}
+label{display:block;color:var(--muted);font-size:17px;margin:0 0 8px 20px}
+.field{position:relative;margin-bottom:20px}
+input{width:100%;height:58px;border:0;border-radius:29px;background:var(--field);color:#fff;font-size:18px;font-family:inherit;padding:0 56px 0 22px}
+.eye{position:absolute;right:14px;bottom:9px;width:40px;height:40px;border:0;background:none;font-size:22px;cursor:pointer;color:#fff}
+.msg{min-height:22px;margin:-4px 0 12px 20px;font-size:15px;color:var(--err)}
+.msg.ok{color:#7ee787}
+.alt{text-align:center;color:var(--muted);font-size:19px;margin-top:6px}
+.link{background:none;border:0;color:#fff;text-decoration:underline;font-weight:600;font-size:19px;font-family:inherit;cursor:pointer;padding:0}
+.home{justify-content:center;text-align:center}
+.home h1{font-size:clamp(34px,10vw,52px)}
+@media (prefers-reduced-motion:reduce){.btn:active{transform:none}}
+</style>
+</head>
+<body>
+<canvas id="dots" aria-hidden="true"></canvas>
+
+<main class="view on" id="welcome">
+  <div class="avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6z"/></svg></div>
+  <div class="grow"></div>
+  <h1>Welcome</h1>
+  <p class="sub">Your journey starts from here</p>
+  <button class="btn p" data-go="signin">Horay u soco</button>
+  <button class="btn s" data-go="register">Isdiwaangeli</button>
+</main>
+
+<main class="view form" id="signin">
+  <button class="back" data-go="welcome" aria-label="Dib u laabo">&larr;</button>
+  <div class="grow"></div>
+  <h1>Sign In</h1>
+  <p class="sub">Enter your credentials to continue</p>
+  <div class="field"><label for="si-u">Username</label><input id="si-u" autocomplete="username" autocapitalize="none"></div>
+  <div class="field"><label for="si-p">Password</label><input id="si-p" type="password" autocomplete="current-password"><button class="eye" type="button" data-eye="si-p" aria-label="Muuji ama qari sirta">👁</button></div>
+  <div class="msg" id="si-m" role="alert"></div>
+  <button class="btn p" id="si-b">Sign In</button>
+  <p class="alt">Do not have an account? <button class="link" data-go="register">Register</button></p>
+</main>
+
+<main class="view form" id="register">
+  <button class="back" data-go="welcome" aria-label="Dib u laabo">&larr;</button>
+  <div class="grow"></div>
+  <h1>Register</h1>
+  <p class="sub">Create an account to get started</p>
+  <div class="field"><label for="rg-u">Username</label><input id="rg-u" autocomplete="username" autocapitalize="none"></div>
+  <div class="field"><label for="rg-p">Password</label><input id="rg-p" type="password" autocomplete="new-password"><button class="eye" type="button" data-eye="rg-p" aria-label="Muuji ama qari sirta">👁</button></div>
+  <div class="msg" id="rg-m" role="alert"></div>
+  <button class="btn p" id="rg-b">Create account</button>
+  <p class="alt">Already have an account? <button class="link" data-go="signin">Sign In</button></p>
+</main>
+
+<main class="view home" id="home">
+  <h1 id="hello">Hello</h1>
+  <p class="sub">You are signed in</p>
+  <button class="btn s" id="out">Sign Out</button>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+function go(v){document.querySelectorAll('.view').forEach(e=>e.classList.toggle('on',e.id===v));document.querySelectorAll('.msg').forEach(m=>m.textContent='')}
+document.addEventListener('click',e=>{
+  const g=e.target.closest('[data-go]');if(g)go(g.dataset.go);
+  const y=e.target.closest('[data-eye]');if(y){const i=$(y.dataset.eye);i.type=i.type==='password'?'text':'password'}
+});
+const tok=()=>{try{return sessionStorage.getItem('tok')}catch(e){return null}};
+async function api(path,body,t){
+  try{
+    const r=await fetch(path,{method:body?'POST':'GET',headers:Object.assign({'Content-Type':'application/json'},t?{Authorization:'Bearer '+t}:{}),body:body?JSON.stringify(body):undefined});
+    return await r.json();
+  }catch(e){return {error:'Cannot reach the server. Check your connection.'}}
+}
+function say(id,t,ok){const m=$(id);m.textContent=t;m.className='msg'+(ok?' ok':'')}
+$('rg-b').onclick=async()=>{
+  const u=$('rg-u').value.trim().toLowerCase(),p=$('rg-p').value;
+  if(u.length<3)return say('rg-m','Username must have at least 3 characters.');
+  if(p.length<6)return say('rg-m','Password must have at least 6 characters.');
+  const r=await api('/api/register',{username:u,password:p});
+  if(r.error)return say('rg-m',r.error);
+  $('si-u').value=u;$('si-p').value='';go('signin');say('si-m','Account created. Sign in to continue.',true);
+};
+$('si-b').onclick=async()=>{
+  const u=$('si-u').value.trim().toLowerCase(),p=$('si-p').value;
+  if(!u||!p)return say('si-m','Enter your username and password.');
+  const r=await api('/api/login',{username:u,password:p});
+  if(r.error)return say('si-m',r.error);
+  try{sessionStorage.setItem('tok',r.token)}catch(e){}
+  enter(r.username);
+};
+function enter(u){$('hello').textContent='Hello, '+u;go('home')}
+$('out').onclick=async()=>{await api('/api/logout',{},tok());try{sessionStorage.removeItem('tok')}catch(e){}$('si-p').value='';go('welcome')};
+['si-u','si-p'].forEach(i=>$(i).addEventListener('keydown',e=>{if(e.key==='Enter')$('si-b').click()}));
+['rg-u','rg-p'].forEach(i=>$(i).addEventListener('keydown',e=>{if(e.key==='Enter')$('rg-b').click()}));
+if(tok())api('/api/me',null,tok()).then(r=>{if(r.username)enter(r.username)});
+
+(function(){
+  const c=$('dots'),x=c.getContext('2d');let W,H,d=[];
+  const still=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  function size(){const r=devicePixelRatio||1;W=innerWidth;H=innerHeight;c.width=W*r;c.height=H*r;x.setTransform(r,0,0,r,0,0)}
+  function make(){const n=Math.round(Math.min(55,W*H/14000));d=[];for(let i=0;i<n;i++)d.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*3.5+1,a:Math.random()*.6+.3,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25})}
+  function draw(){
+    x.clearRect(0,0,W,H);
+    for(const p of d){
+      if(!still){p.x+=p.vx;p.y+=p.vy;if(p.x<-5)p.x=W+5;if(p.x>W+5)p.x=-5;if(p.y<-5)p.y=H+5;if(p.y>H+5)p.y=-5}
+      x.beginPath();x.arc(p.x,p.y,p.r,0,6.283);x.fillStyle='rgba(255,255,255,'+p.a+')';x.fill();
+    }
+    if(!still)requestAnimationFrame(draw)
+  }
+  size();make();draw();
+  addEventListener('resize',()=>{size();make();if(still)draw()});
+})();
+</script>
+</body>
+</html>
