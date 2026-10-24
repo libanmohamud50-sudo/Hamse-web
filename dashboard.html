@@ -26,7 +26,7 @@ const $=s=>document.querySelector(s);
 const ld=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}};
 const sv=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const esc=t=>String(t).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
-const me=ld('hw_session',null);let U=ld('hw_users',{});
+const me=ld('hw_session',null);let U=ld('hw_users',{});if(!U.hamse)U.hamse={name:'hamse',pw:'971e66062c2f0f067d623b34dac6ae75b411cbfac85a5d6c8060c89041cc2b39'};
 if(!me||!U[me]||U[me].banned){location.href='index.html'}
 let keys=ld('hw_keys',[]),refs=ld('hw_refs',[]),acts=ld('hw_act',[]),st=ld('hw_set',{snd:true}),tab='Overview',q='';
 const save=()=>{sv('hw_keys',keys);sv('hw_refs',refs);sv('hw_act',acts);sv('hw_users',U);sv('hw_set',st)};
