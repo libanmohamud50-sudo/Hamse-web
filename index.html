@@ -1,6 +1,46 @@
 <!DOCTYPE html>
 <html lang="so">
 <head>
+<script>
+(function(){
+const K='hw_users',S='hw_session';
+const g=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
+const s=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+async function h(p){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(p));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){return p}}
+const R=(o,c)=>new Response(JSON.stringify(o),{status:c||200,headers:{'Content-Type':'application/json'}});
+const of=window.fetch.bind(window);
+window.fetch=async function(u,o){
+ const url=String((u&&u.url)||u);
+ if(url.indexOf('/api/')<0) return of(u,o);
+ const path=url.split('/api/')[1].split('?')[0];
+ let b={};try{b=JSON.parse((o&&o.body)||'{}')}catch(e){}
+ const users=g(K)||{};
+ const name=String(b.username||'').trim();
+ const key=name.toLowerCase();
+ if(path==='register'){
+  if(!name||!b.password) return R({error:'Fadlan buuxi'},400);
+  if(users[key]) return R({error:'Username hore ayuu u jiray'},409);
+  users[key]={name:name,pw:await h(b.password)};
+  s(K,users); s(S,key);
+  return R({ok:true,username:name});
+ }
+ if(path==='login'){
+  const u=users[key];
+  if(!u||u.pw!==await h(b.password||'')) return R({error:'Username ama password waa khalad'},401);
+  s(S,key);
+  return R({ok:true,username:u.name});
+ }
+ if(path==='me'){
+  const k=g(S);
+  if(k&&users[k]) return R({ok:true,username:users[k].name});
+  return R({error:'Not signed in'},401);
+ }
+ if(path==='logout'){ localStorage.removeItem(S); return R({ok:true}); }
+ return R({error:'Not found'},404);
+};
+})();
+</script>
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Abdi</title>
