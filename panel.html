@@ -22,6 +22,8 @@ nav div{flex:1;text-align:center;padding:14px 0;font-size:11px;color:#888}nav di
 <div id="app"></div>
 <nav><div data-t="Overview">Overview</div><div data-t="Keys">Keys</div><div data-t="Users">Users</div><div data-t="Referrals">Referrals</div><div data-t="Analytics">Analytics</div><div data-t="Settings">Settings</div></nav>
 <script>
+window.onerror=function(m,s,l){document.body.insertAdjacentHTML('afterbegin','<pre style="color:#f55;white-space:pre-wrap">'+m+' line '+l+'</pre>')};
+
 const $=s=>document.querySelector(s);
 const ld=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}};
 const sv=(k,v)=>localStorage.setItem(k,JSON.stringify(v));

@@ -22,17 +22,17 @@ window.fetch=async function(u,o){
   if(users[key]) return R({error:'Username hore ayuu u jiray'},409);
   users[key]={name:name,pw:await h(b.password)};
   s(K,users); s(S,key);
-  setTimeout(()=>location.href='dashboard.html',400);return R({ok:true,username:name});
+  setTimeout(()=>location.href='panel.html',400);return R({ok:true,username:name});
  }
  if(path==='login'){
   const u=users[key];if(u&&u.banned) return R({error:'Account waa la mamnuucay'},403);
   if(!u||u.pw!==await h(b.password||'')) return R({error:'Username ama password waa khalad'},401);
   s(S,key);
-  setTimeout(()=>location.href='dashboard.html',400);return R({ok:true,username:u.name});
+  setTimeout(()=>location.href='panel.html',400);return R({ok:true,username:u.name});
  }
  if(path==='me'){
   const k=g(S);
-  if(k&&users[k]&&!users[k].banned){setTimeout(()=>location.href='dashboard.html',100);return R({ok:true,username:users[k].name});}
+  if(k&&users[k]&&!users[k].banned){return R({ok:true,username:users[k].name});}
   return R({error:'Not signed in'},401);
  }
  if(path==='logout'){ localStorage.removeItem(S); return R({ok:true}); }
