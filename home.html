@@ -21,7 +21,7 @@ window.onerror=function(m,s,l){document.getElementById('err').textContent+=m+' (
 var $=function(s){return document.querySelector(s)};
 function ld(k,d){try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}}
 function esc(t){return String(t).replace(/[<>&"]/g,function(c){return '&#'+c.charCodeAt(0)+';'})}
-var me=ld('hw_session',null),U=ld('hw_users',{}),keys=ld('hw_keys',[]);
+var me=ld('hw_session',null),U=ld('hw_users',{}),keys=ld('hw_keys',[]);if(me&&!U[me]&&me=='hamse')U[me]={name:'hamse',pw:''};
 function save(){localStorage.setItem('hw_keys',JSON.stringify(keys))}
 function gen(){var c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',a=new Uint32Array(16),s='';crypto.getRandomValues(a);for(var i=0;i<16;i++){s+=c[a[i]%c.length];if(i%4==3&&i<15)s+='-'}return s}
 function fmt(ms){return new Date(ms).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}
