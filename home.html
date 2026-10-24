@@ -1,0 +1,42 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hamse Panel</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#000;color:#fff;font-family:system-ui,sans-serif;padding:16px 16px 40px}
+h1{margin:0;font-size:30px}.l{color:#999}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+button,select{font:inherit;color:#fff}
+.btn{background:#222;border:1px solid #333;border-radius:20px;padding:10px 14px;cursor:pointer}
+.red{color:#ff453a}.pri{background:#fff;color:#000;width:100%;font-weight:700;margin-top:8px}
+.card{background:#111;border:1px solid #222;border-radius:20px;padding:16px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}.grid .card{margin:0}.n{font-size:34px;font-weight:700}
+select{width:100%;background:#1b1b1d;border:1px solid #333;border-radius:14px;padding:12px;margin-top:6px}
+.mono{font-family:monospace;font-size:18px;word-break:break-all;margin-bottom:6px}
+.tag{display:inline-block;border-radius:10px;padding:3px 10px;font-size:13px;margin-right:6px;background:#222}
+.g{background:#12351f;color:#30d158}.b{background:#3a1212;color:#ff453a}
+.row{display:flex;gap:8px;margin-top:10px}.row .btn{flex:1}
+#err{color:#f55;white-space:pre-wrap}
+</style></head><body>
+<div id="err"></div><div id="app"></div>
+<script>
+window.onerror=function(m,s,l){document.getElementById('err').textContent+=m+' (line '+l+')\n'};
+var $=function(s){return document.querySelector(s)};
+function ld(k,d){try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}}
+function esc(t){return String(t).replace(/[<>&"]/g,function(c){return '&#'+c.charCodeAt(0)+';'})}
+var me=ld('hw_session',null),U=ld('hw_users',{}),keys=ld('hw_keys',[]);
+function save(){localStorage.setItem('hw_keys',JSON.stringify(keys))}
+function gen(){var c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',a=new Uint32Array(16),s='';crypto.getRandomValues(a);for(var i=0;i<16;i++){s+=c[a[i]%c.length];if(i%4==3&&i<15)s+='-'}return s}
+function fmt(ms){return new Date(ms).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}
+function out(){localStorage.removeItem('hw_session');location.replace('index.html')}
+function mk(){var d=+$('#d').value;keys.unshift({k:gen(),exp:Date.now()+d*864400000});save();R()}
+function R(){
+ var act=keys.filter(function(k){return k.exp>Date.now()}).length;
+ var h='<div class="top"><div><h1>Dashboard</h1><div class="l">Welcome, '+esc(U[me].name)+'</div></div><button class="btn" id="lo">Logout</button></div>';
+ h+='<div class="grid"><div class="card"><div class="l">Users</div><div class="n">'+Object.keys(U).length+'</div></div><div class="card"><div class="l">Total keys</div><div class="n">'+keys.length+'</div></div><div class="card"><div class="l">Active</div><div class="n">'+act+'</div></div><div class="card"><div class="l">Expired</div><div class="n">'+(keys.length-act)+'</div></div></div>';
+ h+='<div class="card"><h3 style="margin-top:0">Generate key</h3><select id="d"><option value="1">1 day</option><option value="7">7 days</option><option value="30" selected>30 days</option><option value="90">90 days</option></select><button class="btn pri" id="gk">Generate</button></div>';
+ h+=keys.map(function(k,i){var on=k.exp>Date.now();return '<div class="card"><div class="mono">'+k.k+'</div><span class="tag '+(on?'g':'b')+'">'+(on?'Active':'Expired')+'</span><span class="l">'+fmt(k.exp)+'</span><div class="row"><button class="btn" data-a="cp" data-i="'+i+'">Copy</button><button class="btn red" data-a="del" data-i="'+i+'">Delete</button></div></div>'}).join('');
+ $('#app').innerHTML=h;$('#lo').onclick=out;$('#gk').onclick=mk;
+}
+document.addEventListener('click',function(e){var b=e.target.closest('button[data-a]');if(!b)return;var i=+b.getAttribute('data-i');
+ if(b.getAttribute('data-a')=='cp'){try{navigator.clipboard.writeText(keys[i].k)}catch(x){}b.textContent='Copied'}
+ else{keys.splice(i,1);save();R()}});
+if(!me||!U[me]){$('#app').innerHTML='<div class="card">Fadlan marka hore gal.<br><br><a href="index.html" style="color:#fff">Tag Sign In</a></div>'}else{R()}
+</script></body></html>
