@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hamse Cheats VIP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #a855f7;
+            --primary-dark: #7e22ce;
+            --bg: #0f0f13;
+            --card: #1c1c22;
+            --text: #ffffff;
+            --text-muted: #a1a1aa;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
+        .app-container { width: 100%; max-width: 400px; padding: 20px; position: relative; }
+        
+        /* Login Screen */
+        .screen { display: none; flex-direction: column; animation: fadeIn 0.3s ease; }
+        .screen.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .logo { font-size: 32px; font-weight: 800; text-align: center; margin-bottom: 10px; background: linear-gradient(to right, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .subtitle { text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: 14px; }
+        
+        .input-group { margin-bottom: 15px; }
+        .input-group input { width: 100%; padding: 15px; background: var(--card); border: 1px solid #333; border-radius: 12px; color: white; font-size: 16px; outline: none; transition: 0.2s; }
+        .input-group input:focus { border-color: var(--primary); }
+        
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s; background: var(--primary); color: white; }
+        .btn:hover { background: var(--primary-dark); }
+        .btn:active { transform: scale(0.98); }
+        
+        .error-msg { color: #ff453a; text-align: center; font-size: 14px; margin-bottom: 10px; display: none; }
+
+        /* Dashboard Screen */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .user-info { font-size: 14px; color: var(--text-muted); }
+        .status-badge { background: #28a745; color: white; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; }
+        
+        .features-grid { display: grid; gap: 15px; }
+        .feature-card { background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        .feature-info h3 { font-size: 16px; margin-bottom: 4px; }
+        .feature-info p { font-size: 12px; color: var(--text-muted); }
+        
+        /* Toggle Switch */
+        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(22px); }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="screen active">
+        <div class="logo">HAMSE CHEATS</div>
+        <div class="subtitle">VIP Loader Panel</div>
+        
+        <div id="errorMsg" class="error-msg"></div>
+        
+        <div class="input-group">
+            <input type="text" id="licenseKey" placeholder="Enter License Key" autocapitalize="none" autocomplete="off">
+        </div>
+        <button class="btn" onclick="verifyKey()">Login</button>
+    </div>
+
+    <!-- DASHBOARD SCREEN -->
+    <div id="dashboardScreen" class="screen">
+        <div class="header">
+            <div>
+                <h2 style="font-size: 20px;">Dashboard</h2>
+                <div class="user-info">Key: <span id="currentKey">...</span></div>
+            </div>
+            <div class="status-badge" id="timeLeft">Active</div>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-info">
+                    <h3>Aimbot</h3>
+                    <p>Auto lock onto enemies</p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" onchange="toggleFeature(this, 'Aimbot')">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-info">
+                    <h3>Wallhack</h3>
+                    <p>See enemies through walls</p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" onchange="toggleFeature(this, 'Wallhack')">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-info">
+                    <h3>Speed Hack</h3>
+                    <p>Increase movement speed</p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" onchange="toggleFeature(this, 'Speed')">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-info">
+                    <h3>No Recoil</h3>
+                    <p>Remove weapon kickback</p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" onchange="toggleFeature(this, 'NoRecoil')">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // URL-ka Worker-kaaga
+    const API_URL = "https://a.hamse.workers.dev";
+
+    async function verifyKey() {
+        const keyInput = document.getElementById('licenseKey').value.trim();
+        const errorMsg = document.getElementById('errorMsg');
+        
+        if (!keyInput) {
+            errorMsg.textContent = "Please enter a key.";
+            errorMsg.style.display = 'block';
+            return;
+        }
+
+        errorMsg.style.display = 'none';
+        const btn = document.querySelector('#loginScreen .btn');
+        btn.textContent = "Verifying...";
+        btn.disabled = true;
+
+        try {
+            // Xiriirka Worker-kaaga
+            const res = await fetch(`${API_URL}/verify?key=${keyInput}`);
+            const data = await res.json();
+
+            if (data.status === true || data.valid === true) {
+                // Key-ga waa sax
+                document.getElementById('loginScreen').classList.remove('active');
+                document.getElementById('dashboardScreen').classList.add('active');
+                document.getElementById('currentKey').textContent = keyInput;
+                document.getElementById('timeLeft').textContent = data.expire ? `Expires: ${data.expire.split(' ')[0]}` : 'Lifetime';
+            } else {
+                errorMsg.textContent = data.reason || data.msg || "Invalid or Expired Key.";
+                errorMsg.style.display = 'block';
+            }
+        } catch (err) {
+            errorMsg.textContent = "Connection error. Check internet.";
+            errorMsg.style.display = 'block';
+        } finally {
+            btn.textContent = "Login";
+            btn.disabled = false;
+        }
+    }
+
+    function toggleFeature(el, name) {
+        if (el.checked) {
+            console.log(`[+] ${name} Enabled`);
+        } else {
+            console.log(`[-] ${name} Disabled`);
+        }
+    }
+</script>
+</body>
+</html>
