@@ -199,4 +199,30 @@ if(!me||!U[me]||U[me].banned){
 }else{
  Object.keys(U).forEach(function(n){if(!U[n].at)U[n].at=Date.now()});
  save();R()}
-</script></body></html>
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var inputs = document.querySelectorAll('input');
+    if (inputs.length >= 2) {
+        inputs[0].placeholder = "License Key / Admin Key";
+        inputs[0].style.display = 'block';
+        inputs[0].name = "admin_key";
+        inputs[1].style.display = 'none'; // Qari password-ka
+        inputs[1].parentElement.style.display = 'none';
+    }
+    var forms = document.querySelectorAll('form');
+    forms.forEach(function(f) {
+        f.onsubmit = function(e) {
+            e.preventDefault();
+            var key = document.querySelector('input').value.trim();
+            if(key) {
+                localStorage.setItem("hw_admin", key);
+                localStorage.setItem("logged_in", "true");
+                window.location.reload();
+            }
+        };
+    });
+});
+</script>
+
+</body></html>
