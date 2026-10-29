@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="so">
+<html lang="en">
 <head><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
 <script>
 (function(){
@@ -14,7 +14,7 @@ window.fetch=async function(u,o){
  if(url.indexOf('/api/')<0) return of(u,o);
  const path=url.split('/api/')[1].split('?')[0];
  let b={};try{b=JSON.parse((o&&o.body)||'{}')}catch(e){}
- const users=g(K)||{};users['hamse']=users['hamse']||{name:'hamse',pw:'971e66062c2f0f067d623b34dac6ae75b411cbfac85a5d6c8060c89041cc2b39'};
+ const users=g(K)||{};
  const name=String(b.username||'').trim();
  const key=name.toLowerCase();
  if(path==='register'){
@@ -115,28 +115,28 @@ input:focus{border-color:rgba(255,77,126,.8);background:rgba(255,255,255,.085)}
   <h1>Welcome</h1>
   <p class="sub">A smarter way to manage your access.</p>
   <button class="btn p" data-go="signin">Continue to sign in</button>
-  <button class="btn s" data-go="register">Create an account</button>
+  <button class="btn s" data-go="register">Register with referral code</button>
 </main>
 
 <main class="view form" id="signin">
-  <button class="back" data-go="welcome" aria-label="Dib u laabo">&larr;</button>
+  <button class="back" data-go="welcome" aria-label="Go back">&larr;</button>
   <div class="grow"></div>
   <h1>Sign In</h1>
   <p class="sub">Welcome back. Enter your details to continue.</p>
   <div class="field"><label for="si-u">Username</label><input id="si-u" autocomplete="username" autocapitalize="none"></div>
-  <div class="field"><label for="si-p">Password</label><input id="si-p" type="password" autocomplete="current-password"><button class="eye" type="button" data-eye="si-p" aria-label="Muuji ama qari sirta">👁</button></div>
+  <div class="field"><label for="si-p">Password</label><input id="si-p" type="password" autocomplete="current-password"><button class="eye" type="button" data-eye="si-p" aria-label="Show or hide password">👁</button></div>
   <div class="msg" id="si-m" role="alert"></div>
   <button class="btn p" id="si-b">Sign In</button>
   <p class="alt">Do not have an account? <button class="link" data-go="register">Register</button></p>
 </main>
 
 <main class="view form" id="register">
-  <button class="back" data-go="welcome" aria-label="Dib u laabo">&larr;</button>
+  <button class="back" data-go="welcome" aria-label="Go back">&larr;</button>
   <div class="grow"></div>
   <h1>Register</h1>
   <p class="sub">Create your account and enter a valid dashboard referral code.</p>
   <div class="field"><label for="rg-u">Username</label><input id="rg-u" autocomplete="username" autocapitalize="none"></div>
-  <div class="field"><label for="rg-p">Password</label><input id="rg-p" type="password" autocomplete="new-password"><button class="eye" type="button" data-eye="rg-p" aria-label="Muuji ama qari sirta">👁</button></div>
+  <div class="field"><label for="rg-p">Password</label><input id="rg-p" type="password" autocomplete="new-password"><button class="eye" type="button" data-eye="rg-p" aria-label="Show or hide password">👁</button></div>
   <div class="field"><label for="rg-ref">Referral Code (required)</label><input id="rg-ref" required autocomplete="off" autocapitalize="characters" placeholder="Enter code created in dashboard"></div>
   <div class="msg" id="rg-m" role="alert"></div>
   <button class="btn p" id="rg-b">Create account</button>
@@ -168,6 +168,7 @@ $('rg-b').onclick=async()=>{
   const u=$('rg-u').value.trim().toLowerCase(),p=$('rg-p').value,referralCode=$('rg-ref').value.trim().toUpperCase();
   if(u.length<3)return say('rg-m','Username must have at least 3 characters.');
   if(p.length<6)return say('rg-m','Password must have at least 6 characters.');
+  if(!referralCode)return say('rg-m','A valid referral code is required.');
   const r=await api('/api/register',{username:u,password:p,referralCode});
   if(r.error)return say('rg-m',r.error);
   $('si-u').value=u;$('si-p').value='';go('signin');say('si-m','Account created. Sign in to continue.',true);
