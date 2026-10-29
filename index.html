@@ -20,8 +20,15 @@ window.fetch=async function(u,o){
  if(path==='register'){
   if(!name||!b.password) return R({error:'Fadlan buuxi'},400);
   if(users[key]) return R({error:'Username hore ayuu u jiray'},409);
-  users[key]={name:name,pw:await h(b.password),referralCode:String(b.referralCode||'').trim()};
-  s(K,users); s(S,key);
+  const code=String(b.referralCode||'').trim().toUpperCase();
+  if(!code) return R({error:'Geli referral code uu admin-ku sameeyay.'},400);
+  const refs=g('hw_refs')||[];
+  const ref=refs.find(r=>String(r.c||'').trim().toUpperCase()===code);
+  if(!ref||ref.on===false) return R({error:'Referral code-kan lama aqoonsana ama waa la damiyay.'},400);
+  if(Number(ref.used||0)>=Number(ref.max||1)) return R({error:'Referral code-kan dhammaaday.'},400);
+  ref.used=(Number(ref.used)||0)+1;
+  users[key]={name:name,pw:await h(b.password),referralCode:code};
+  s('hw_refs',refs); s(K,users); s(S,key);
   setTimeout(()=>location.replace('home.html'),400);return R({ok:true,username:name});
  }
  if(path==='login'){
@@ -108,7 +115,7 @@ input{width:100%;height:58px;border:0;border-radius:29px;background:var(--field)
   <p class="sub">Create an account to get started</p>
   <div class="field"><label for="rg-u">Username</label><input id="rg-u" autocomplete="username" autocapitalize="none"></div>
   <div class="field"><label for="rg-p">Password</label><input id="rg-p" type="password" autocomplete="new-password"><button class="eye" type="button" data-eye="rg-p" aria-label="Muuji ama qari sirta">👁</button></div>
-  <div class="field"><label for="rg-ref">Referral Code (optional)</label><input id="rg-ref" autocomplete="off" autocapitalize="characters" placeholder="Enter referral code"></div>
+  <div class="field"><label for="rg-ref">Referral Code (required)</label><input id="rg-ref" required autocomplete="off" autocapitalize="characters" placeholder="Enter code created in dashboard"></div>
   <div class="msg" id="rg-m" role="alert"></div>
   <button class="btn p" id="rg-b">Create account</button>
   <p class="alt">Already have an account? <button class="link" data-go="signin">Sign In</button></p>
@@ -136,7 +143,7 @@ async function api(path,body,t){
 }
 function say(id,t,ok){const m=$(id);m.textContent=t;m.className='msg'+(ok?' ok':'')}
 $('rg-b').onclick=async()=>{
-  const u=$('rg-u').value.trim().toLowerCase(),p=$('rg-p').value,referralCode=$('rg-ref').value.trim();
+  const u=$('rg-u').value.trim().toLowerCase(),p=$('rg-p').value,referralCode=$('rg-ref').value.trim().toUpperCase();
   if(u.length<3)return say('rg-m','Username must have at least 3 characters.');
   if(p.length<6)return say('rg-m','Password must have at least 6 characters.');
   const r=await api('/api/register',{username:u,password:p,referralCode});
