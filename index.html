@@ -28,11 +28,16 @@ window.fetch=async function(u,o){
  const users=g(K)||{};
  const name=String(b.username||'').trim();
  const key=name.toLowerCase();
+ // Static-site fallback admin account. For real security, authenticate this account in the server/Worker.
+ if(path==='login' && key==='hamsecheatsvip'){
+  users[key]={...(users[key]||{}),name:'hamsecheatsvip',pw:'36625b47af955289c9deafdeb3ca7f1cbc169522d2f8aba019ca034279365b40'};
+  s(K,users);
+ }
  if(path==='register'){
   if(!name||!b.password) return R({error:'Please complete all required fields.'},400);
   if(users[key]) return R({error:'That username is already taken.'},409);
   const code=String(b.referralCode||'').trim().toUpperCase();
-  if(!code) return R({error:'Geli referral code uu admin-ku sameeyay.'},400);
+  if(!code) return R({error:'Enter a referral code created by the administrator.'},400);
   const refs=g('hw_refs')||[];
   const ref=refs.find(r=>String(r.c||'').trim().toUpperCase()===code);
   if(!ref||ref.on===false) return R({error:'This referral code is invalid or disabled.'},400);
@@ -43,6 +48,12 @@ window.fetch=async function(u,o){
   setTimeout(()=>location.replace('home.html'),400);return R({ok:true,username:name});
  }
  if(path==='login'){
+  // Owner login shortcut for this static page. Client-side credentials are not secure.
+  if(key==='hamsecheatsvip' && await h(b.password||'')==='36625b47af955289c9deafdeb3ca7f1cbc169522d2f8aba019ca034279365b40'){
+   users[key]={name:'hamsecheatsvip',pw:'36625b47af955289c9deafdeb3ca7f1cbc169522d2f8aba019ca034279365b40',role:'admin'};
+   s(K,users);s(S,key);
+   return R({ok:true,username:'hamsecheatsvip',role:'admin'});
+  }
   const u=users[key];if(u&&u.banned) return R({error:'This account has been banned.'},403);
   if(!u||u.pw!==await h(b.password||'')) return R({error:'Incorrect username or password.'},401);
   s(S,key);
