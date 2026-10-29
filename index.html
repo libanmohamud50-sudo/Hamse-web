@@ -20,7 +20,7 @@ window.fetch=async function(u,o){
  if(path==='register'){
   if(!name||!b.password) return R({error:'Fadlan buuxi'},400);
   if(users[key]) return R({error:'Username hore ayuu u jiray'},409);
-  users[key]={name:name,pw:await h(b.password)};
+  users[key]={name:name,pw:await h(b.password),referralCode:String(b.referralCode||'').trim()};
   s(K,users); s(S,key);
   setTimeout(()=>location.replace('home.html'),400);return R({ok:true,username:name});
  }
@@ -108,6 +108,7 @@ input{width:100%;height:58px;border:0;border-radius:29px;background:var(--field)
   <p class="sub">Create an account to get started</p>
   <div class="field"><label for="rg-u">Username</label><input id="rg-u" autocomplete="username" autocapitalize="none"></div>
   <div class="field"><label for="rg-p">Password</label><input id="rg-p" type="password" autocomplete="new-password"><button class="eye" type="button" data-eye="rg-p" aria-label="Muuji ama qari sirta">👁</button></div>
+  <div class="field"><label for="rg-ref">Referral Code (optional)</label><input id="rg-ref" autocomplete="off" autocapitalize="characters" placeholder="Enter referral code"></div>
   <div class="msg" id="rg-m" role="alert"></div>
   <button class="btn p" id="rg-b">Create account</button>
   <p class="alt">Already have an account? <button class="link" data-go="signin">Sign In</button></p>
@@ -135,10 +136,10 @@ async function api(path,body,t){
 }
 function say(id,t,ok){const m=$(id);m.textContent=t;m.className='msg'+(ok?' ok':'')}
 $('rg-b').onclick=async()=>{
-  const u=$('rg-u').value.trim().toLowerCase(),p=$('rg-p').value;
+  const u=$('rg-u').value.trim().toLowerCase(),p=$('rg-p').value,referralCode=$('rg-ref').value.trim();
   if(u.length<3)return say('rg-m','Username must have at least 3 characters.');
   if(p.length<6)return say('rg-m','Password must have at least 6 characters.');
-  const r=await api('/api/register',{username:u,password:p});
+  const r=await api('/api/register',{username:u,password:p,referralCode});
   if(r.error)return say('rg-m',r.error);
   $('si-u').value=u;$('si-p').value='';go('signin');say('si-m','Account created. Sign in to continue.',true);
 };
@@ -153,7 +154,7 @@ $('si-b').onclick=async()=>{
 function enter(u){$('hello').textContent='Hello, '+u;go('home')}
 $('out').onclick=async()=>{await api('/api/logout',{},tok());try{sessionStorage.removeItem('tok')}catch(e){}$('si-p').value='';go('welcome')};
 ['si-u','si-p'].forEach(i=>$(i).addEventListener('keydown',e=>{if(e.key==='Enter')$('si-b').click()}));
-['rg-u','rg-p'].forEach(i=>$(i).addEventListener('keydown',e=>{if(e.key==='Enter')$('rg-b').click()}));
+['rg-u','rg-p','rg-ref'].forEach(i=>$(i).addEventListener('keydown',e=>{if(e.key==='Enter')$('rg-b').click()}));
 if(tok())api('/api/me',null,tok()).then(r=>{if(r.username)enter(r.username)});
 
 (function(){
