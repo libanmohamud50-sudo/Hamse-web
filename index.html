@@ -52,6 +52,7 @@ window.fetch=async function(u,o){
   if(key==='hamsecheatsvip' && await h(b.password||'')==='36625b47af955289c9deafdeb3ca7f1cbc169522d2f8aba019ca034279365b40'){
    users[key]={name:'hamsecheatsvip',pw:'36625b47af955289c9deafdeb3ca7f1cbc169522d2f8aba019ca034279365b40',role:'admin'};
    s(K,users);s(S,key);
+   setTimeout(()=>location.replace('home.html'),250);
    return R({ok:true,username:'hamsecheatsvip',role:'admin'});
   }
   const u=users[key];if(u&&u.banned) return R({error:'This account has been banned.'},403);
