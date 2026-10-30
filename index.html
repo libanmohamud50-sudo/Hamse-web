@@ -43,6 +43,28 @@ h1{font-size:clamp(28px,8vw,36px);line-height:1.1;font-weight:800;margin:0;text-
 .msg{min-height:20px;margin:0 2px 12px;font-size:14px;line-height:1.45;color:var(--err);text-align:center;font-weight:bold;}
 .alt{text-align:center;color:var(--muted);font-size:13px;line-height:1.7;margin:8px 0 0}
 
+/* Qaabka Dashboard-ka */
+.dash-card {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: 30px 24px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+  text-align: center;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.dash-card .logo { width: 90px; height: 90px; border-radius: 50%; margin: 0 auto 20px; border: 2px solid rgba(255,50,104,.6); object-fit: cover; box-shadow: 0 0 20px rgba(255,50,104,.3); }
+.dash-card h1 { font-size: 24px; margin-bottom: 5px; }
+.dash-card .subtitle { color: #4db8ff; font-size: 13px; letter-spacing: 2px; margin-bottom: 25px; text-transform: uppercase; font-weight: bold; }
+.status-box { background: rgba(0, 255, 100, 0.1); border: 1px solid rgba(0, 255, 100, 0.3); color: #00ff64; padding: 12px; border-radius: 12px; font-size: 14px; font-weight: 600; margin-bottom: 30px; }
+.menu-btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 16px; margin-bottom: 15px; border: 1px solid var(--line); border-radius: 16px; background: rgba(255, 255, 255, 0.03); color: #fff; font-size: 16px; font-weight: 600; text-decoration: none; transition: 0.2s; }
+.menu-btn:hover { background: rgba(255, 255, 255, 0.08); }
+.menu-btn.pink { background: var(--pink); border-color: var(--pink); box-shadow: 0 10px 20px rgba(255, 50, 104, 0.2); }
+.logout-btn { display: block; width: 100%; padding: 14px; margin-top: 30px; border: 1px solid rgba(255, 50, 104, 0.5); border-radius: 30px; background: transparent; color: var(--pink); font-size: 15px; font-weight: 700; text-decoration: none; transition: 0.2s; cursor: pointer; }
+.logout-btn:hover { background: rgba(255, 50, 104, 0.1); }
+
 @media(max-height:720px){
  .view{padding-top:max(12px,env(safe-area-inset-top));padding-bottom:max(12px,env(safe-area-inset-bottom))}
  .avatar{width:80px;height:80px;margin-bottom:15px}
@@ -55,7 +77,8 @@ h1{font-size:clamp(28px,8vw,36px);line-height:1.1;font-weight:800;margin:0;text-
 <body>
 <canvas id="dots" aria-hidden="true"></canvas>
 
-<main class="view on" id="welcome">
+<!-- QAYBTA 1: BOGGA LOGIN-KA -->
+<main class="view on" id="view-login">
   <div class="avatar">
     <img src="https://instasize.com/api/image/d77553321c385d9c3ca8c5aa18d7e89c2e385739504190b58b7af93a4c9928d4.jpeg" alt="Hamse Cheats Logo">
   </div>
@@ -85,12 +108,34 @@ h1{font-size:clamp(28px,8vw,36px);line-height:1.1;font-weight:800;margin:0;text-
   <p class="alt">Powered by <strong style="color:#4db8ff;">hamsecheatsvip</strong></p>
 </main>
 
+<!-- QAYBTA 2: BOGGA DASHBOARD-KA -->
+<main class="view" id="view-dashboard">
+  <div class="dash-card">
+    <img src="https://instasize.com/api/image/d77553321c385d9c3ca8c5aa18d7e89c2e385739504190b58b7af93a4c9928d4.jpeg" alt="Logo" class="logo">
+    
+    <h1>HAMSE CHEATS</h1>
+    <div class="subtitle">VIP Dashboard</div>
+    
+    <div class="status-box">
+      ✔ Access Granted
+    </div>
+
+    <!-- Halkan ku dar link-yadaaga rasmiga ah -->
+    <a href="#" class="menu-btn pink">Download Cheats</a>
+    <a href="#" class="menu-btn">View Tutorials</a>
+    <a href="#" class="menu-btn">Buy VIP Keys</a>
+
+    <button id="logout-btn" class="logout-btn">Logout</button>
+  </div>
+</main>
+
 <script>
 const $=id=>document.getElementById(id);
 
-// Halkan ayaa lagu beddeli karaa Secret Key-ga aad rabto
+// Halkan ayaa lagu beddeli karaa Secret Key-ga
 const SECRET_KEYS = ['Tg1'];
 
+// Marka badhanka Login-ka la riixo
 $('login-btn').onclick = function() {
   const key = $('main-key').value.trim();
   const msg = $('login-msg');
@@ -100,17 +145,24 @@ $('login-btn').onclick = function() {
     return;
   }
 
-  // Hubinta Key-ga
   if (SECRET_KEYS.includes(key)) {
     msg.textContent = '';
-    // Haddii Key-ga sax yahay, toos u gudub dashboard-ka
-    location.replace('home.html');
+    // Qari bogga login-ka, soo bandhig dashboard-ka (isla bogga dhexdiisa)
+    $('view-login').classList.remove('on');
+    $('view-dashboard').classList.add('on');
   } else {
     msg.textContent = 'Invalid Secret Key.';
   }
 };
 
-// Canvas dots animation
+// Marka badhanka Logout-ka la riixo
+$('logout-btn').onclick = function() {
+  $('main-key').value = '';
+  $('view-dashboard').classList.remove('on');
+  $('view-login').classList.add('on');
+};
+
+// Canvas dots animation (Dhibcaha madowga ah)
 (function(){
   const c=$('dots'),x=c.getContext('2d');let W,H,d=[];
   const still=matchMedia('(prefers-reduced-motion:reduce)').matches;
