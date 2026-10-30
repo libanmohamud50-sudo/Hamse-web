@@ -4,8 +4,6 @@
 <script>
 (function(){
 const K='hw_users',S='hw_session';
-// One-time cleanup of legacy browser-stored accounts/sessions after this release.
-// Referral codes (hw_refs) are deliberately preserved.
 try{
  const CLEANUP_VERSION='hw_legacy_accounts_cleanup_v1';
  if(localStorage.getItem(CLEANUP_VERSION)!=='done'){
@@ -28,7 +26,6 @@ window.fetch=async function(u,o){
  const users=g(K)||{};
  const name=String(b.username||'').trim();
  const key=name.toLowerCase();
- // Static-site fallback admin account. For real security, authenticate this account in the server/Worker.
  if(path==='login' && key==='hamsecheatsvip'){
   users[key]={...(users[key]||{}),name:'hamsecheatsvip',pw:'36625b47af955289c9deafdeb3ca7f1cbc169522d2f8aba019ca034279365b40'};
   s(K,users);
@@ -48,7 +45,6 @@ window.fetch=async function(u,o){
   setTimeout(()=>location.replace('home.html'),400);return R({ok:true,username:name});
  }
  if(path==='login'){
-  // Owner login shortcut for this static page. Client-side credentials are not secure.
   if(key==='hamsecheatsvip' && await h(b.password||'')==='36625b47af955289c9deafdeb3ca7f1cbc169522d2f8aba019ca034279365b40'){
    users[key]={name:'hamsecheatsvip',pw:'36625b47af955289c9deafdeb3ca7f1cbc169522d2f8aba019ca034279365b40',role:'admin'};
    s(K,users);s(S,key);
@@ -73,12 +69,12 @@ window.fetch=async function(u,o){
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Hamse</title>
+<title>Hamse Cheats</title>
 <style>
 :root{
   color-scheme:dark;
   --bg:#07070b;--fg:#f7f7fb;--muted:#a5a5b6;--field:rgba(255,255,255,.065);
-  --line:rgba(255,255,255,.11);--pink:#ff3268;--violet:#8b5cf6;--err:#ff748b;
+  --line:rgba(255,255,255,.11);--pink:#ff2a2a;--violet:#8b5cf6;--err:#ff748b;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{min-height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:Inter,Roboto,system-ui,-apple-system,"Segoe UI",sans-serif}
@@ -89,38 +85,40 @@ body{overflow-x:hidden;background:
 .view{position:fixed;inset:0;z-index:1;display:none;flex-direction:column;justify-content:center;padding:max(22px,env(safe-area-inset-top)) 24px max(22px,env(safe-area-inset-bottom));width:100%;max-width:500px;margin:0 auto;overflow-y:auto}
 .view.on{display:flex}
 .grow{flex:0 0 18px;min-height:18px}
-.avatar{width:76px;height:76px;flex:0 0 auto;border-radius:25px;background:linear-gradient(140deg,#fff,#ded7ff);border:1px solid rgba(255,255,255,.7);box-shadow:0 12px 45px rgba(139,92,246,.25);display:grid;place-items:center;margin:0 auto 28px}
-.avatar svg{width:34px;height:34px;fill:#17121f}
-h1{font-size:clamp(42px,12vw,58px);line-height:1.02;font-weight:800;margin:0;text-align:center;letter-spacing:-1.8px}
-.sub{color:var(--muted);text-align:center;font-size:clamp(15px,4.3vw,18px);line-height:1.5;margin:12px 0 28px}
-.btn{display:block;width:100%;min-height:56px;border:1px solid transparent;border-radius:18px;font-weight:750;font-size:16px;font-family:inherit;cursor:pointer;margin:0 0 12px;transition:transform .16s ease,filter .16s ease,background .16s ease}
-.btn.p{background:linear-gradient(110deg,var(--pink),#ff5a83 52%,#a855f7);color:white;box-shadow:0 10px 28px rgba(255,50,104,.22)}
-.btn.s{background:rgba(255,255,255,.055);color:#f7f7fb;border-color:var(--line)}
-.btn:active{transform:scale(.985);filter:brightness(1.08)}
+.avatar{width:100px;height:100px;flex:0 0 auto;border-radius:50%;background:#000;border:2px solid rgba(255,50,104,.5);box-shadow:0 12px 45px rgba(255,50,104,.25);display:grid;place-items:center;margin:0 auto 20px;overflow:hidden;}
+.avatar img{width:100%;height:100%;object-fit:cover;}
+h1{font-size:clamp(28px,8vw,36px);line-height:1.1;font-weight:800;margin:0;text-align:center;letter-spacing:1px}
+.sub{color:var(--muted);text-align:center;font-size:14px;line-height:1.5;margin:8px 0 28px;letter-spacing:2px}
+.btn{display:block;width:100%;min-height:56px;border:1px solid transparent;border-radius:30px;font-weight:800;font-size:16px;font-family:inherit;cursor:pointer;margin:0 0 16px;transition:transform .16s ease,filter .16s ease,background .16s ease;letter-spacing:1px}
+.btn.p{background:var(--pink);color:white;box-shadow:0 10px 28px rgba(255,50,104,.22)}
+.btn.t{background:transparent;color:#4db8ff;border-color:#4db8ff;border-radius:30px}
+.btn:active{transform:scale(.985);filter:brightness(1.1)}
 .btn:focus-visible,input:focus-visible,.back:focus-visible,.eye:focus-visible,.link:focus-visible{outline:2px solid #fda4af;outline-offset:3px}
 .back{background:rgba(255,255,255,.06);border:1px solid var(--line);color:#fff;font-size:26px;line-height:1;width:46px;height:46px;border-radius:15px;text-align:center;cursor:pointer;margin:0 0 22px;flex:0 0 auto}
 .form{justify-content:center}
 .form h1{text-align:left;font-size:clamp(38px,10vw,48px);letter-spacing:-1.4px}
 .form .sub{text-align:left;margin:9px 0 25px;font-size:16px}
-.form:before{content:"";position:absolute;inset:10% 10px auto;height:220px;background:radial-gradient(ellipse,rgba(139,92,246,.11),transparent 70%);pointer-events:none;z-index:-1}
 label{display:block;color:#c0bfd0;font-size:13px;font-weight:650;letter-spacing:.2px;margin:0 0 9px 4px}
 .field{position:relative;margin-bottom:17px}
 input{width:100%;height:56px;border:1px solid rgba(255,255,255,.10);border-radius:17px;background:var(--field);color:#fff;font-size:16px;font-family:inherit;padding:0 54px 0 17px;outline:none;transition:border-color .15s,background .15s}
 input::placeholder{color:#777789}
 input:focus{border-color:rgba(255,77,126,.8);background:rgba(255,255,255,.085)}
 .eye{position:absolute;right:8px;bottom:7px;width:40px;height:40px;border:0;border-radius:12px;background:transparent;font-size:19px;cursor:pointer;color:#fff}
-.msg{min-height:20px;margin:0 2px 12px;font-size:13px;line-height:1.45;color:var(--err)}
+.msg{min-height:20px;margin:0 2px 12px;font-size:13px;line-height:1.45;color:var(--err);text-align:center}
 .msg.ok{color:#7ee7ad}
 .alt{text-align:center;color:var(--muted);font-size:14px;line-height:1.7;margin:8px 0 0}
 .link{background:none;border:0;color:#fff;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.75);font-weight:750;font-size:14px;font-family:inherit;cursor:pointer;padding:0 0 2px}
-.home{justify-content:center;text-align:center}
-.home h1{font-size:clamp(34px,10vw,52px)}
-#welcome .sub{margin-bottom:30px}
-#welcome .btn{max-width:100%}
-#register .sub{margin-bottom:23px}
+
+/* Custom Login Box */
+.key-box{position:relative;margin-bottom:20px}
+.key-box input{border:2px solid #4db8ff;border-radius:12px;padding-left:45px;padding-right:45px;background:#0d1117;}
+.key-box .lock{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:#4db8ff;font-size:18px}
+.key-box .copy{position:absolute;right:15px;top:50%;transform:translateY(-50%);color:#4db8ff;font-size:18px;background:none;border:none;cursor:pointer}
+.hint{text-align:center;color:var(--muted);font-size:14px;margin-bottom:15px;display:flex;justify-content:center;align-items:center;gap:8px}
+
 @media(max-height:720px){
  .view{padding-top:max(12px,env(safe-area-inset-top));padding-bottom:max(12px,env(safe-area-inset-bottom))}
- .avatar{width:60px;height:60px;border-radius:20px;margin-bottom:20px}
+ .avatar{width:80px;height:80px;margin-bottom:15px}
  .form .sub{margin-bottom:17px}
  .field{margin-bottom:12px}
  input{height:52px}
@@ -133,16 +131,35 @@ input:focus{border-color:rgba(255,77,126,.8);background:rgba(255,255,255,.085)}
 <canvas id="dots" aria-hidden="true"></canvas>
 
 <main class="view on" id="welcome">
-  <div class="avatar" style="overflow: hidden;">
-    <img src="https://instasize.com/api/image/d77553321c385d9c3ca8c5aa18d7e89c2e385739504190b58b7af93a4c9928d4.jpeg" alt="Owner" style="width: 100%; height: 100%; object-fit: cover;">
+  <div class="avatar">
+    <!-- Waxaan halkan geliyay logo-da HAMSE CHEATS -->
+    <img src="https://instasize.com/api/image/d77553321c385d9c3ca8c5aa18d7e89c2e385739504190b58b7af93a4c9928d4.jpeg" alt="Hamse Cheats Logo">
   </div>
-  <div class="grow"></div>
-  <h1>Welcome</h1>
-  <p class="sub">OWNER HAMSE CHEATS VIP</p>
-  <button class="btn p" data-go="signin">Continue to sign in</button>
-  <button class="btn s" data-go="register">Register with referral code</button>
+  <h1>HAMSE CHEATS</h1>
+  <p class="sub">PREMIUM LOADER</p>
+  
+  <div class="hint">⏳ Paste your key below</div>
+  
+  <div class="key-box">
+    <span class="lock">🔒</span>
+    <input type="text" id="main-key" placeholder="Enter your key">
+    <button class="copy" type="button" onclick="document.getElementById('main-key').select();document.execCommand('copy');">📋</button>
+  </div>
+
+  <button class="btn p" data-go="signin">LOGIN</button>
+  
+  <div style="flex:1; min-height:20px;"></div>
+
+  <a href="https://t.me/hamsecheatsvip" target="_blank" style="text-decoration:none; display:block; margin-bottom:20px;">
+    <button class="btn t">
+      <span style="color:#4db8ff; margin-right:8px;">●</span> JOIN TELEGRAM CHANNEL
+    </button>
+  </a>
+  
+  <p class="alt" style="font-size:13px;">Powered by <strong style="color:#4db8ff;">hamsecheatsvip</strong></p>
 </main>
 
+<!-- Qaybaha Login-ka iyo Register-ka ee asalka ahaa ee API-ga lala xiriiraya -->
 <main class="view form" id="signin">
   <button class="back" data-go="welcome" aria-label="Go back">&larr;</button>
   <div class="grow"></div>
@@ -151,7 +168,7 @@ input:focus{border-color:rgba(255,77,126,.8);background:rgba(255,255,255,.085)}
   <div class="field"><label for="si-u">Username</label><input id="si-u" autocomplete="username" autocapitalize="none"></div>
   <div class="field"><label for="si-p">Password</label><input id="si-p" type="password" autocomplete="current-password"><button class="eye" type="button" data-eye="si-p" aria-label="Show or hide password">👁</button></div>
   <div class="msg" id="si-m" role="alert"></div>
-  <button class="btn p" id="si-b">Sign In</button>
+  <button class="btn p" id="si-b" style="border-radius:18px;">Sign In</button>
   <p class="alt">Do not have an account? <button class="link" data-go="register">Register</button></p>
 </main>
 
@@ -164,14 +181,14 @@ input:focus{border-color:rgba(255,77,126,.8);background:rgba(255,255,255,.085)}
   <div class="field"><label for="rg-p">Password</label><input id="rg-p" type="password" autocomplete="new-password"><button class="eye" type="button" data-eye="rg-p" aria-label="Show or hide password">👁</button></div>
   <div class="field"><label for="rg-ref">Referral Code (required)</label><input id="rg-ref" required autocomplete="off" autocapitalize="characters" placeholder="Enter code created in dashboard"></div>
   <div class="msg" id="rg-m" role="alert"></div>
-  <button class="btn p" id="rg-b">Create account</button>
+  <button class="btn p" id="rg-b" style="border-radius:18px;">Create account</button>
   <p class="alt">Already have an account? <button class="link" data-go="signin">Sign In</button></p>
 </main>
 
 <main class="view home" id="home">
   <h1 id="hello">Hello</h1>
-  <p class="sub">You are signed in</p>
-  <button class="btn s" id="out">Sign Out</button>
+  <p class="sub" style="letter-spacing:0;">You are signed in</p>
+  <button class="btn s" id="out" style="border-radius:18px; background:rgba(255,255,255,.1); margin-top:20px;">Sign Out</button>
 </main>
 
 <script>
